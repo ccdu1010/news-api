@@ -10,7 +10,6 @@ app.get("/api", getApi);
 
 // register middleware
 app.use(handleCustomErrors);
-app.use(handlePsqlErrors);
 app.use(handleServerErrors);
 
 module.exports = app;

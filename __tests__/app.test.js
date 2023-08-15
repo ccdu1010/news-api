@@ -33,9 +33,9 @@ describe("app", () => {
     .expect(200)
     .then((response) => {
       const {topics} = response.body;
-      topics.forEach((topics) => {
-        expect(topics).toHaveProperty("slug", expect.any(String));
-        expect(topics).toHaveProperty("description", expect.any(String));
+      topics.forEach((topic) => {
+        expect(topic).toHaveProperty("slug", expect.any(String));
+        expect(topic).toHaveProperty("description", expect.any(String));
       });
     });  
   });
