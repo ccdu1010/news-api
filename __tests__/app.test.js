@@ -2,6 +2,7 @@ const app = require("../app");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const request = require("supertest");
+const endpointsFile = require("../endpoints.json");
 const { topicData, userData, articleData, commentData  } = require("../db/data/test-data");
 
 beforeEach(() => {
@@ -50,26 +51,13 @@ describe("app", () => {
   });
  });
  describe("GET /api", () => {
-  test("200: responds with a status of 200", () => {
-    return request(app).get("/api").expect(200);
-  });
   test("200: responds with an accurate JSON object", () => {
     return request(app)
     .get("/api")
     .expect(200)
     .then((response) => {
       const {endpoints} = response.body;
-      for(const key in endpoints) {
-        const value = endpoints[key];
-        expect(value).toHaveProperty("description", expect.any(String));
-        if(key != "GET /api") {
-            expect(value).toHaveProperty("queries", expect.any(Array));
-            expect(value).toHaveProperty("exampleResponse", expect.any(Object));
-        }
-        if(value.hasOwnProperty("requestBodyFormat")) {
-            expect(value).toHaveProperty("requestBodyFormat", expect.any(Object));
-        }
-      };
+      expect(endpoints).toEqual(endpointsFile);
     });
   });
  });
