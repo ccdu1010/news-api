@@ -121,8 +121,8 @@ describe("app", () => {
     .then((response) => {
       const { articles } = response.body;
       expect(articles).toBeSortedBy('created_at', { descending: true });
-  })
- })
+    })
+  });
   test("200: respond with an article object with the following properties when article objects are found", () => {
     return request(app)
     .get(`/api/articles`)
@@ -142,11 +142,6 @@ describe("app", () => {
       expect(article).toHaveProperty("comment_count", expect.any(Number));
       expect(article).not.toHaveProperty("body");
     });
-  });
- });
- describe("Error handling", () => {
-  test("404:route that does not exist returns 404", () => {
-    return request(app).get("/notARoute").expect(404);
   });
  });
  });
@@ -188,5 +183,20 @@ describe("app", () => {
       });
     });
   });
- })
-})
+  test("200: responds with comments sorted descending based on created_at when comments for an article are found", () => {
+    const testArticleId = 1;
+    return request(app)
+    .get(`/api/articles/${testArticleId}/comments`)
+    .expect(200)
+    .then((response) => {
+      const { comments } = response.body;
+      expect(comments).toBeSortedBy('created_at', { descending: true });
+    })
+  });
+ });
+ describe("Error handling", () => {
+  test("404:route that does not exist returns 404", () => {
+    return request(app).get("/notARoute").expect(404);
+  });
+ });
+});
