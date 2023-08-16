@@ -149,5 +149,44 @@ describe("app", () => {
     return request(app).get("/notARoute").expect(404);
   });
  });
+ });
+ describe("GET /api/articles/:article_id/comments", () => {
+  test("200: responds with a status of 200 when the comments for an article is found", () => {
+    const testArticleId = 1;
+    return request(app)
+    .get(`/api/articles/${testArticleId}/comments`)
+    .expect(200);
+  });
+  test("404: responds with a status of 404 when the article is not found", () => {
+    const testArticleId = 40000;
+    return request(app)
+    .get(`/api/articles/${testArticleId}/comments`)
+    .expect(404);
+  });
+  test("400: responds with a status of 400 when the article id is an invalid number", () => {
+    const testArticleId = "Hello";
+    return request(app)
+    .get(`/api/articles/${testArticleId}/comments`)
+    .expect(400);
+  });
+  test("200: respond with comments with the following properties when comments for an article are found", () => {
+    const testArticleId = 1;
+    return request(app)
+    .get(`/api/articles/${testArticleId}/comments`)
+    .expect(200)
+    .then((response) => {
+      const {comments} = response.body;
+      expect(comments.length).not.toEqual(0);
+      comments.forEach((comment) => {
+        expect(comment).toBeInstanceOf(Object);
+        expect(comment).toHaveProperty("comment_id", expect.any(Number));
+        expect(comment).toHaveProperty("votes", expect.any(Number));
+        expect(comment).toHaveProperty("created_at", expect.any(String));
+        expect(comment).toHaveProperty("author", expect.any(String));
+        expect(comment).toHaveProperty("body", expect.any(String));
+        expect(comment).toHaveProperty("article_id", expect.any(Number));
+      });
+    });
+  });
  })
 })

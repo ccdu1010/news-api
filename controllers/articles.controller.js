@@ -1,4 +1,4 @@
-const { selectArticlesByArticleId, selectAllArticles } = require("../models/articles.model");
+const { selectArticlesByArticleId, selectAllArticles, selectAllCommentsByArticleId } = require("../models/articles.model");
 
 exports.getArticleById = (request, response, next) => {
   const articleId = request.params.article_id;
@@ -17,3 +17,11 @@ exports.getAllArticles = (request, response, next) => {
   .catch(next);
 };
 
+exports.getAllCommentsByArticleId = (request, response, next) => {
+  const articleId = request.params.article_id;
+  selectAllCommentsByArticleId(articleId)
+  .then((comments) => {
+    response.status(200).send({comments: comments});
+  })
+  .catch(next);
+};
