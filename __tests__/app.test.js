@@ -107,18 +107,29 @@ describe("app", () => {
     return request(app)
     .get(`/api/articles`)
     .expect(200)
-    .then((response) => {
-      const articleIdToTest = 34;
-      const article = response.body.articles.filter(article => article.article_id === articleIdToTest);
-      const expectedCommentCount = 11;
+    .then((response) => { 
+      const articleIdToTest = 3;
+      const articles = response.body.articles.filter(article => article.article_id === articleIdToTest);
+      const expectedCommentCount = 2;
+      expect(articles[0]).toHaveProperty("comment_count", expectedCommentCount);
     });
   });
+  test("200: responds with articles sorted descending based on created_at", () => {
+    return request(app)
+    .get(`/api/articles`)
+    .expect(200)
+    .then((response) => {
+      const { articles } = response.body;
+      expect(articles).toBeSortedBy('created_at', { descending: true });
+  })
+ })
   test("200: respond with an article object with the following properties when article objects are found", () => {
     return request(app)
     .get(`/api/articles`)
     .expect(200)
     .then((response) => {
       const {articles} = response.body;
+      expect(articles.length).not.toEqual(0);
       articles.forEach((article) => {
       expect(article).toBeInstanceOf(Object);
       expect(article).toHaveProperty("author", expect.any(String));
@@ -128,7 +139,7 @@ describe("app", () => {
       expect(article).toHaveProperty("created_at", expect.any(String));
       expect(article).toHaveProperty("votes", expect.any(Number));
       expect(article).toHaveProperty("article_img_url", expect.any(String));
-      expect(article).toHaveProperty("comment_count", expect.any(String));
+      expect(article).toHaveProperty("comment_count", expect.any(Number));
       expect(article).not.toHaveProperty("body");
     });
   });
