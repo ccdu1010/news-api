@@ -1,6 +1,7 @@
-const { selectArticlesByArticleId } = require("../models/articles.model");
+const articles = require("../db/data/test-data/articles");
+const { selectArticlesByArticleId, selectAllArticles } = require("../models/articles.model");
 
-const getArticleById = (request, response, next) => {
+exports.getArticleById = (request, response, next) => {
   const articleId = request.params.article_id;
   selectArticlesByArticleId(articleId)
   .then((article) => {
@@ -16,4 +17,18 @@ const getArticleById = (request, response, next) => {
   .catch(next);
 };
 
-module.exports = { getArticleById }
+exports.getAllArticles = (request, response, next) => {
+  selectAllArticles()
+  .then((articles) => {
+    if(!articles || articles.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: `No articles found`,
+        });
+    } else {
+        response.status(200).send({articles: articles});
+    }
+  })
+  .catch(next);
+}
+
