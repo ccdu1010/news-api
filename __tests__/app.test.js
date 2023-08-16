@@ -61,6 +61,44 @@ describe("app", () => {
     });
   });
  });
+ describe("GET /api/articles/:article_id", () => {
+  test("200: responds with a status of 200 when the article is found", () => {
+    const testArticleId = 4;
+    return request(app)
+    .get(`/api/articles/${testArticleId}`)
+    .expect(200);
+  });
+  test("404: responds with a status of 404 when the article is not found", () => {
+    const testArticleId = 40000;
+    return request(app)
+    .get(`/api/articles/${testArticleId}`)
+    .expect(404);
+  });
+  test("400: responds with a status of 400 when the article id is an invalid number", () => {
+    const testArticleId = "Hello";
+    return request(app)
+    .get(`/api/articles/${testArticleId}`)
+    .expect(400);
+  });
+  test("200: respond with an aticle object with the following properties when the article is found", () => {
+    const testArticleId = 3;
+    return request(app)
+    .get(`/api/articles/${testArticleId}`)
+    .expect(200)
+    .then((response) => {
+      const article = response.body.article;
+      expect(article).toBeInstanceOf(Object);
+      expect(article).toHaveProperty("author", expect.any(String));
+      expect(article).toHaveProperty("title", expect.any(String));
+      expect(article).toHaveProperty("article_id", testArticleId);
+      expect(article).toHaveProperty("body", expect.any(String));
+      expect(article).toHaveProperty("topic", expect.any(String));
+      expect(article).toHaveProperty("created_at", expect.any(String));
+      expect(article).toHaveProperty("votes", expect.any(Number));
+      expect(article).toHaveProperty("article_img_url", expect.any(String));
+    })
+  })
+ });
  describe("Error handling", () => {
   test("404:route that does not exist returns 404", () => {
     return request(app).get("/notARoute").expect(404);
