@@ -1,3 +1,4 @@
+const format = require("pg-format");
 const db = require("../db/connection");
 
 exports.selectArticlesByArticleId = (articleId) => {
@@ -73,4 +74,36 @@ exports.selectAllCommentsByArticleId = (articleId) => {
         return result.rows;
       }
     });
+}
+
+exports.insertCommentForArticle = (articleId, newComment) => {
+  const parsedArticleId = parseInt(articleId);
+  if(isNaN(parsedArticleId)) {
+    return Promise.reject({
+      status: 400,
+      msg: `The article_id '${articleId}' is not a valid number`,
+    });
+  }
+  const {username, body} = newComment;
+  if(!username) {
+    return Promise.reject({
+      status: 400,
+      msg: `A username is required`,
+    });
+  }
+  if(!body) {
+    return Promise.reject({
+      status: 400,
+      msg: `A body is required`,
+    });
+  }
+  
+  const queryStr = format(
+    `INSERT INTO comments (article_id, author, body) VALUES %L Returning *`, 
+    [[articleId, username, body]]
+  );
+
+  return db.query(queryStr).then(({ rows }) => {
+    return rows[0];
+  })
 }

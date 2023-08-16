@@ -194,6 +194,91 @@ describe("app", () => {
     })
   });
  });
+ describe("POST /api/articles/:article_id/comments", () => {
+  test("201: adding a valid comment for existing article responds with status 201", () => {
+    const testArticleId = 4;
+    const requestBody = {
+      username: 'icellusedkars',
+      body: 'Lobster pot'
+    };
+    return request(app)
+     .post(`/api/articles/${testArticleId}/comments`)
+     .send(requestBody)
+     .expect(201);
+  });
+  test("201: adding a valid comment for existing article responds with added comment", () => {
+    const testArticleId = 4;
+    const requestBody = {
+      username: 'icellusedkars',
+      body: 'Lobster pot'
+    };
+
+    return request(app)
+     .post(`/api/articles/${testArticleId}/comments`)
+     .send(requestBody)
+     .expect(201)
+     .then((response) => {
+        const comment = response.body.comment;
+        expect(comment).toHaveProperty('article_id', testArticleId);
+        expect(comment).toHaveProperty('author', requestBody.username);
+        expect(comment).toHaveProperty('body', requestBody.body);
+        expect(comment).toHaveProperty('votes', 0);
+     });
+  });
+  test("400: adding a valid comment for an article that does not exist responds with status 400", () => {
+    const testArticleId = 4000;
+    const requestBody = {
+      username: 'icellusedkars',
+      body: 'Lobster pot'
+    };
+    return request(app)
+     .post(`/api/articles/${testArticleId}/comments`)
+     .send(requestBody)
+     .expect(400);
+  });
+  test("400: adding a valid comment for a user that does not exist responds with status 400", () => {
+    const testArticleId = 4;
+    const requestBody = {
+      username: 'notrealuser',
+      body: 'Lobster pot'
+    };
+    return request(app)
+     .post(`/api/articles/${testArticleId}/comments`)
+     .send(requestBody)
+     .expect(400);
+  });
+  test("400: adding a valid comment with an article id that is an invalid number responds with a status of 400", () => {
+    const testArticleId = "hello";
+    const requestBody = {
+      username: 'icellusedkars',
+      body: 'Lobster pot'
+    };
+    return request(app)
+     .post(`/api/articles/${testArticleId}/comments`)
+     .send(requestBody)
+     .expect(400);
+  });
+  test("400: adding a comment missing a username responds with a status of 400", () => {
+    const testArticleId = 4;
+    const requestBody = {
+      body: 'Lobster pot'
+    };
+    return request(app)
+     .post(`/api/articles/${testArticleId}/comments`)
+     .send(requestBody)
+     .expect(400);
+  });
+  test("400: adding a comment missing a body responds with a status of 400", () => {
+    const testArticleId = 4;
+    const requestBody = {
+      username: 'icellusedkars'
+    };
+    return request(app)
+     .post(`/api/articles/${testArticleId}/comments`)
+     .send(requestBody)
+     .expect(400);
+  });
+ })
  describe("Error handling", () => {
   test("404:route that does not exist returns 404", () => {
     return request(app).get("/notARoute").expect(404);
