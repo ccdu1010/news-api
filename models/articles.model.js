@@ -77,13 +77,6 @@ exports.selectAllCommentsByArticleId = (articleId) => {
 }
 
 exports.insertCommentForArticle = (articleId, newComment) => {
-  const parsedArticleId = parseInt(articleId);
-  if(isNaN(parsedArticleId)) {
-    return Promise.reject({
-      status: 400,
-      msg: `The article_id '${articleId}' is not a valid number`,
-    });
-  }
   const {username, body} = newComment;
   if(!username) {
     return Promise.reject({

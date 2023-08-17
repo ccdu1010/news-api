@@ -67,18 +67,24 @@ describe("app", () => {
     return request(app)
     .get(`/api/articles/${testArticleId}`)
     .expect(200);
-  });
+    });
   test("404: responds with a status of 404 when the article is not found", () => {
     const testArticleId = 40000;
     return request(app)
     .get(`/api/articles/${testArticleId}`)
-    .expect(404);
+    .expect(404)
+    .then(({body}) => {
+      expect(body.msg).toBe("No article found for article_id: 40000")
+    });
   });
   test("400: responds with a status of 400 when the article id is an invalid number", () => {
     const testArticleId = "Hello";
     return request(app)
     .get(`/api/articles/${testArticleId}`)
-    .expect(400);
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toBe("The article_id 'Hello' is not a valid number");
+    });
   });
   test("200: respond with an article object with the following properties when the article is found", () => {
     const testArticleId = 3;
@@ -156,13 +162,19 @@ describe("app", () => {
     const testArticleId = 40000;
     return request(app)
     .get(`/api/articles/${testArticleId}/comments`)
-    .expect(404);
+    .expect(404)
+    .then(({body}) => {
+      expect(body.msg).toBe("No comments found for article_id: 40000")
+    });
   });
   test("400: responds with a status of 400 when the article id is an invalid number", () => {
     const testArticleId = "Hello";
     return request(app)
     .get(`/api/articles/${testArticleId}/comments`)
-    .expect(400);
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toBe("The article_id 'Hello' is not a valid number")
+    });
   });
   test("200: respond with comments with the following properties when comments for an article are found", () => {
     const testArticleId = 1;
@@ -234,7 +246,10 @@ describe("app", () => {
     return request(app)
      .post(`/api/articles/${testArticleId}/comments`)
      .send(requestBody)
-     .expect(400);
+     .expect(400)
+     .then(({body}) => {
+      expect(body.msg).toBe("Invalid input");
+    });
   });
   test("400: adding a valid comment for a user that does not exist responds with status 400", () => {
     const testArticleId = 4;
@@ -245,7 +260,10 @@ describe("app", () => {
     return request(app)
      .post(`/api/articles/${testArticleId}/comments`)
      .send(requestBody)
-     .expect(400);
+     .expect(400)
+     .then(({body}) => {
+      expect(body.msg).toBe("Invalid input");
+    });
   });
   test("400: adding a valid comment with an article id that is an invalid number responds with a status of 400", () => {
     const testArticleId = "hello";
@@ -256,7 +274,10 @@ describe("app", () => {
     return request(app)
      .post(`/api/articles/${testArticleId}/comments`)
      .send(requestBody)
-     .expect(400);
+     .expect(400)
+     .then(({body}) => {
+      expect(body.msg).toBe("Invalid input");
+    });
   });
   test("400: adding a comment missing a username responds with a status of 400", () => {
     const testArticleId = 4;
@@ -266,7 +287,10 @@ describe("app", () => {
     return request(app)
      .post(`/api/articles/${testArticleId}/comments`)
      .send(requestBody)
-     .expect(400);
+     .expect(400)
+     .then(({body}) => {
+      expect(body.msg).toBe("A username is required");
+    });
   });
   test("400: adding a comment missing a body responds with a status of 400", () => {
     const testArticleId = 4;
@@ -276,7 +300,27 @@ describe("app", () => {
     return request(app)
      .post(`/api/articles/${testArticleId}/comments`)
      .send(requestBody)
-     .expect(400);
+     .expect(400)
+     .then(({body}) => {
+      expect(body.msg).toBe("A body is required");
+    });
+  });
+  test("201: adding a valid comment with acceptable properties and ignore the extra one", () => {
+    const testArticleId = 4;
+    const requestBody = {
+      username: 'icellusedkars',
+      body: 'Lobster pot',
+      age: 38
+    };
+
+    return request(app)
+     .post(`/api/articles/${testArticleId}/comments`)
+     .send(requestBody)
+     .expect(201)
+     .then((response) => {
+        const comment = response.body.comment;
+        expect(comment).not.toHaveProperty('age', 38)
+     });
   });
  })
  describe("Error handling", () => {
@@ -284,4 +328,4 @@ describe("app", () => {
     return request(app).get("/notARoute").expect(404);
   });
  });
-});
+})
