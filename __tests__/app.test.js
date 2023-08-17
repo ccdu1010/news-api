@@ -461,6 +461,33 @@ describe("app", () => {
     });
   });
  });
+ describe("GET /api/users", () => {
+  test("200: Getting users responds with 200 and an array of users with the expected properties", () => {
+    return request(app)
+    .get(`/api/users`)
+    .expect(200)
+    .then((response) => { 
+      const {users} = response.body;
+      expect(users).toBeInstanceOf(Array);
+      expect(users.length).not.toEqual(0);
+      users.forEach((article) => {
+        expect(article).toBeInstanceOf(Object);
+        expect(article).toHaveProperty("username", expect.any(String));
+        expect(article).toHaveProperty("name", expect.any(String));
+        expect(article).toHaveProperty("avatar_url", expect.any(String));
+      });
+    });
+  });
+  test("200: responds with an array of users with correct data", () => {
+    return request(app)
+    .get("/api/users")
+    .expect(200)
+    .then((response) => {
+      const {users} = response.body;
+      expect(users).toEqual(userData);
+    });  
+  });
+ });
  describe("Error handling", () => {
   test("404:route that does not exist returns 404", () => {
     return request(app).get("/notARoute").expect(404);
