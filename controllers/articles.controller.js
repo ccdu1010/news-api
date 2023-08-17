@@ -2,7 +2,8 @@ const {
   selectArticlesByArticleId, 
   selectAllArticles, 
   selectAllCommentsByArticleId, 
-  insertCommentForArticle
+  insertCommentForArticle,
+  updateArticleByArticleId
 } = require("../models/articles.model");
 
 exports.getArticleById = (request, response, next) => {
@@ -41,3 +42,13 @@ exports.postCommentForArticle = (request, response, next) => {
    })
    .catch(next);
 };
+
+exports.patchArticleByArticleId = (request, response, next) => {
+  const articleId = request.params.article_id;
+  const { inc_votes } = request.body;
+  updateArticleByArticleId(articleId, inc_votes)
+  .then((article) => {
+    response.status(200).send({article : article});
+  })
+  .catch(next);
+}

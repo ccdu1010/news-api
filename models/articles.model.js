@@ -100,3 +100,29 @@ exports.insertCommentForArticle = (articleId, newComment) => {
     return rows[0];
   })
 }
+
+exports.updateArticleByArticleId = (articleId, inc_votes) => {
+  if(!inc_votes) {
+    return Promise.reject({
+      status: 400,
+      msg: `An inc_votes property is required`,
+    });
+  }
+  
+  return db.query(`
+    UPDATE articles
+    SET votes = votes + $1
+    WHERE article_id = $2
+    RETURNING *;
+    `, [inc_votes, articleId])  
+    .then(result => {
+      if(result.rows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: `No article found for article_id: ${articleId}`,
+        })
+      } else {
+        return result.rows[0];
+      }
+    });
+}

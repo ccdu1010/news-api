@@ -316,7 +316,107 @@ describe("app", () => {
         expect(comment).not.toHaveProperty('age', 38)
      });
   });
- })
+ });
+ describe("PATCH /api/articles/:article_id", () => {
+  test("200: patching an existing article with positive votes responds with article having incremented votes", () => {
+    const testArticleId = 4;
+    const requestBody = { inc_votes: 3 };
+    const expectedVotes = 3;
+    return request(app)
+    .patch(`/api/articles/${testArticleId}`)
+    .send(requestBody)
+    .expect(200)
+    .then((response) => {
+      const article = response.body.article;
+      expect(article).toHaveProperty("votes", expectedVotes);
+      expect(article).toHaveProperty("author", expect.any(String));
+      expect(article).toHaveProperty("title", expect.any(String));
+      expect(article).toHaveProperty("article_id", testArticleId);
+      expect(article).toHaveProperty("body", expect.any(String));
+      expect(article).toHaveProperty("topic", expect.any(String));
+      expect(article).toHaveProperty("created_at", expect.any(String));
+      expect(article).toHaveProperty("article_img_url", expect.any(String));
+    });
+  });
+  test("200: responds with a status of 200 and article with updated votes when the article is found", () => {
+    const testArticleId = 4;
+    const requestBody = { inc_votes: -12 };
+    const expectedVotes = -12;
+    return request(app)
+    .patch(`/api/articles/${testArticleId}`)
+    .send(requestBody)
+    .expect(200)
+    .then((response) => {
+      const article = response.body.article;
+      expect(article).toHaveProperty("votes", expectedVotes);
+    });
+  });
+  test("200: responds with a status of 200 and article with correct updated votes when the article is found and called more than once", () => {
+    const testArticleId = 4;
+    const requestBody = { inc_votes: -12 };
+    const requestBody2 = { inc_votes: 15 };
+    const expectedVotes = 3;
+    return request(app)
+    .patch(`/api/articles/${testArticleId}`)
+    .send(requestBody)
+    .expect(200)
+    .then((response) => {
+      return request(app)
+      .patch(`/api/articles/${testArticleId}`)
+      .send(requestBody2)
+      .expect(200)
+      .then((response) => {
+        const article = response.body.article;
+        expect(article).toHaveProperty("votes", expectedVotes);
+      });
+    });
+    
+  });
+  test("404: responds with a status of 404 when the article is not found", () => {
+    const testArticleId = 40000;
+    const requestBody = { inc_votes: 5 };
+    return request(app)
+    .patch(`/api/articles/${testArticleId}`)
+    .send(requestBody)
+    .expect(404)
+    .then(({body}) => {
+      expect(body.msg).toBe("No article found for article_id: 40000")
+    });
+  });
+  test("400: responds with a status of 400 when the article id is an invalid number", () => {
+    const testArticleId = "Hello";
+    const requestBody = { inc_votes: -1 };
+    return request(app)
+    .patch(`/api/articles/${testArticleId}`)
+    .send(requestBody)
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toBe("Invalid input");
+    });
+  });
+  test("400: responds with a status of 400 when the inc_votes property is missing", () => {
+    const testArticleId = 4;
+    const requestBody = { };
+    return request(app)
+    .patch(`/api/articles/${testArticleId}`)
+    .send(requestBody)
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toBe("An inc_votes property is required");
+    });
+  });
+  test("400: responds with a status of 400 when the inc_votes property is an invalid number", () => {
+    const testArticleId = 4;
+    const requestBody = { inc_votes: "cats" };
+    return request(app)
+    .patch(`/api/articles/${testArticleId}`)
+    .send(requestBody)
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toBe("Invalid input");
+    });
+  });
+ });
  describe("Error handling", () => {
   test("404:route that does not exist returns 404", () => {
     return request(app).get("/notARoute").expect(404);
