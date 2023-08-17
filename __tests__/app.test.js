@@ -152,12 +152,6 @@ describe("app", () => {
  });
  });
  describe("GET /api/articles/:article_id/comments", () => {
-  test("200: responds with a status of 200 when the comments for an article is found", () => {
-    const testArticleId = 1;
-    return request(app)
-    .get(`/api/articles/${testArticleId}/comments`)
-    .expect(200);
-  });
   test("404: responds with a status of 404 when the article is not found", () => {
     const testArticleId = 40000;
     return request(app)
@@ -191,7 +185,7 @@ describe("app", () => {
         expect(comment).toHaveProperty("created_at", expect.any(String));
         expect(comment).toHaveProperty("author", expect.any(String));
         expect(comment).toHaveProperty("body", expect.any(String));
-        expect(comment).toHaveProperty("article_id", expect.any(Number));
+        expect(comment).toHaveProperty("article_id", 1);
       });
     });
   });
