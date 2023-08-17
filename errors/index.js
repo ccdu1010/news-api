@@ -4,7 +4,7 @@ exports.handleCustomErrors = (err, req, res, next) => {
     } else next(err);
 };
 
-exports.handlePsqlErrors = (err, req, res, next) => 
+exports.handlePsqlErrors = (err, req, res, next) => {
     const invalid_text_representation = '22P02';
     const foreign_key_violation = '23503';
     if (err.code === foreign_key_violation || err.code === invalid_text_representation) {
