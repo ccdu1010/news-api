@@ -42,5 +42,21 @@
         "article_img_url": "https://images.pexels.com/photos/4974912/pexels-photo-4974912.jpeg?w=700&h=700"
       }
     }
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "serves comments matching the given article_id",
+    "queries": [],
+    "exampleResponse": {
+        "comments": [
+          {
+            "comment_id": 2,
+            "body": "Nobis consequatur animi. Ullam nobis quaerat voluptates veniam.",
+            "article_id": 4,
+            "author": "grumpy19",
+            "votes": 7,
+            "created_at": "2020-01-01T15:02:00.000Z"
+          }
+        ]
+    }
   }
 }

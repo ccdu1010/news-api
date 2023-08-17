@@ -121,8 +121,8 @@ describe("app", () => {
     .then((response) => {
       const { articles } = response.body;
       expect(articles).toBeSortedBy('created_at', { descending: true });
-  })
- })
+    })
+  });
   test("200: respond with an article object with the following properties when article objects are found", () => {
     return request(app)
     .get(`/api/articles`)
@@ -144,10 +144,53 @@ describe("app", () => {
     });
   });
  });
+ });
+ describe("GET /api/articles/:article_id/comments", () => {
+  test("404: responds with a status of 404 when the article is not found", () => {
+    const testArticleId = 40000;
+    return request(app)
+    .get(`/api/articles/${testArticleId}/comments`)
+    .expect(404);
+  });
+  test("400: responds with a status of 400 when the article id is an invalid number", () => {
+    const testArticleId = "Hello";
+    return request(app)
+    .get(`/api/articles/${testArticleId}/comments`)
+    .expect(400);
+  });
+  test("200: respond with comments with the following properties when comments for an article are found", () => {
+    const testArticleId = 1;
+    return request(app)
+    .get(`/api/articles/${testArticleId}/comments`)
+    .expect(200)
+    .then((response) => {
+      const {comments} = response.body;
+      expect(comments.length).not.toEqual(0);
+      comments.forEach((comment) => {
+        expect(comment).toBeInstanceOf(Object);
+        expect(comment).toHaveProperty("comment_id", expect.any(Number));
+        expect(comment).toHaveProperty("votes", expect.any(Number));
+        expect(comment).toHaveProperty("created_at", expect.any(String));
+        expect(comment).toHaveProperty("author", expect.any(String));
+        expect(comment).toHaveProperty("body", expect.any(String));
+        expect(comment).toHaveProperty("article_id", 1);
+      });
+    });
+  });
+  test("200: responds with comments sorted descending based on created_at when comments for an article are found", () => {
+    const testArticleId = 1;
+    return request(app)
+    .get(`/api/articles/${testArticleId}/comments`)
+    .expect(200)
+    .then((response) => {
+      const { comments } = response.body;
+      expect(comments).toBeSortedBy('created_at', { descending: true });
+    })
+  });
+ });
  describe("Error handling", () => {
   test("404:route that does not exist returns 404", () => {
     return request(app).get("/notARoute").expect(404);
   });
  });
- })
-})
+});

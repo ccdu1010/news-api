@@ -49,4 +49,28 @@ exports.selectAllArticles = () => {
     });
 };
 
+exports.selectAllCommentsByArticleId = (articleId) => {
+  const parsedArticleId = parseInt(articleId);
+  if(isNaN(parsedArticleId)) {
+    return Promise.reject({
+      status: 400,
+      msg: `The article_id '${articleId}' is not a valid number`,
+    });
+  }
 
+  return db.query(`
+    SELECT * 
+    FROM comments 
+    WHERE article_id = $1
+    ORDER BY created_at DESC`, [parsedArticleId])
+    .then(result => {
+      if(result.rows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: `No comments found for article_id: ${articleId}`,
+        })
+      } else {
+        return result.rows;
+      }
+    });
+}
