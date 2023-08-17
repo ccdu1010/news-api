@@ -338,7 +338,7 @@ describe("app", () => {
       expect(article).toHaveProperty("article_img_url", expect.any(String));
     });
   });
-  test("200: responds with a status of 200 and article with updated votes when the article is found", () => {
+  test("200: patching an existing article with negative votes responds with article having decremented votes", () => {
     const testArticleId = 4;
     const requestBody = { inc_votes: -12 };
     const expectedVotes = -12;
@@ -351,7 +351,7 @@ describe("app", () => {
       expect(article).toHaveProperty("votes", expectedVotes);
     });
   });
-  test("200: responds with a status of 200 and article with correct updated votes when the article is found and called more than once", () => {
+  test("200: patching an existing article more than once with positive and negative votes responds with article having the correct votes", () => {
     const testArticleId = 4;
     const requestBody = { inc_votes: -12 };
     const requestBody2 = { inc_votes: 15 };
