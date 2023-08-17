@@ -164,7 +164,7 @@ describe("app", () => {
     .get(`/api/articles/${testArticleId}/comments`)
     .expect(404)
     .then(({body}) => {
-      expect(body.msg).toBe("No comments found for article_id: 40000")
+      expect(body.msg).toBe("No article is found with article_id: 40000")
     });
   });
   test("400: responds with a status of 400 when the article id is an invalid number", () => {

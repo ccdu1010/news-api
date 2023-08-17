@@ -68,7 +68,7 @@ exports.selectAllCommentsByArticleId = (articleId) => {
       if(result.rows.length === 0) {
         return Promise.reject({
           status: 404,
-          msg: `No comments found for article_id: ${articleId}`,
+          msg: `No article is found with article_id: ${articleId}`,
         })
       } else {
         return result.rows;
@@ -95,7 +95,7 @@ exports.insertCommentForArticle = (articleId, newComment) => {
     `INSERT INTO comments (article_id, author, body) VALUES %L Returning *`, 
     [[articleId, username, body]]
   );
-
+  
   return db.query(queryStr).then(({ rows }) => {
     return rows[0];
   })
