@@ -417,6 +417,50 @@ describe("app", () => {
     });
   });
  });
+ describe("DELETE /api/comments/:comment_id", () => {
+  test("404: responds with a status of 404 when the comment is not found", () => {
+    const testCommentId = 40000;
+    return request(app)
+    .delete(`/api/comments/${testCommentId}`)
+    .expect(404)
+    .then(({body}) => {
+      expect(body.msg).toBe("No comment found with comment_id: 40000")
+    });
+  });
+  test("400: responds with a status of 400 when the comment id is an invalid number", () => {
+    const testCommentId = "hello";
+    return request(app)
+    .delete(`/api/comments/${testCommentId}`)
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toBe("Invalid input");
+    });
+  });
+  test("204: deleting an existing comment responds with 204 and no content", () => {
+    const testCommentId = 1;
+    return request(app)
+    .delete(`/api/comments/${testCommentId}`)
+    .expect(204)
+    .then((response) => {
+      expect(response.body).toEqual({});
+    });
+  });
+  test("404: deleting an existing comment responds with 204 and deleting comment again returns 404", () => {
+    const testCommentId = 1;
+    return request(app)
+    .delete(`/api/comments/${testCommentId}`)
+    .expect(204)
+    .then((response) => {
+      expect(response.body).toEqual({});
+      return request(app)
+        .delete(`/api/comments/${testCommentId}`)
+        .expect(404)
+        .then(({body}) => {
+          expect(body.msg).toBe("No comment found with comment_id: 1");
+        });
+    });
+  });
+ });
  describe("Error handling", () => {
   test("404:route that does not exist returns 404", () => {
     return request(app).get("/notARoute").expect(404);
