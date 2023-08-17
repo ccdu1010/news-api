@@ -26,7 +26,7 @@ exports.getAllCommentsByArticleId = (request, response, next) => {
   const articleId = request.params.article_id;
   selectAllCommentsByArticleId(articleId)
   .then((comments) => {
-    response.status(200).send({comments: comments});
+    response.status(200).send({comments});
   })
   .catch(next);
 };

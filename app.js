@@ -1,12 +1,7 @@
 const express = require ("express");
 const { getAllTopics } = require("./controllers/topics.controller");
 const { getApi } = require("./controllers/api.controller");
-const { 
-    getArticleById, 
-    getAllArticles, 
-    getAllCommentsByArticleId, 
-    postCommentForArticle 
-} = require("./controllers/articles.controller");
+const { getArticleById, getAllArticles, getAllCommentsByArticleId, postCommentForArticle } = require("./controllers/articles.controller");
 const { handleCustomErrors, handlePsqlErrors, handleServerErrors } = require('./errors/index.js');
 const app = express();
 
