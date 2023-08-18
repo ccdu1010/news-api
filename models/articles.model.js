@@ -23,15 +23,7 @@ exports.selectArticlesByArticleId = (articleId) => {
   });
 };
 
-exports.selectAllArticles = (topic, sort_by="created_at", order="desc") => {
-  if(order.toLowerCase() !== 'asc' &&
-     order.toLowerCase() !== 'desc') {
-    return Promise.reject({
-      status: 400,
-      msg: `The order query must be 'asc' or 'desc'`,
-    });
-  }
-  
+exports.selectAllArticles = (topic, sort_by="created_at", order="desc") => { 
   let topicFilter = "";
   if(topic) {
     topicFilter = `WHERE topic = '${topic}'`;

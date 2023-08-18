@@ -135,7 +135,7 @@ describe("app", () => {
     .expect(200)
     .then((response) => {
       const {articles} = response.body;
-      expect(articles.length).not.toEqual(0);
+      expect(articles.length).not.toBe(0);
       articles.forEach((article) => {
       expect(article).toBeInstanceOf(Object);
       expect(article).toHaveProperty("author", expect.any(String));
@@ -151,14 +151,14 @@ describe("app", () => {
   });
   });
   test("200: responds with only articles matching topic when topic is provided", () => {
-    const topic = 'mitch'
+    const topic = 'mitch';
     return request(app)
     .get(`/api/articles`)
-    .query({ topic: topic })
+    .query({ topic })
     .expect(200)
     .then((response) => { 
       const {articles} = response.body;
-      expect(articles.length).not.toEqual(0);
+      expect(articles.length).not.toBe(0);
       articles.forEach((article) => {
         expect(article).toBeInstanceOf(Object);
         expect(article).toHaveProperty("topic", topic);
@@ -166,10 +166,10 @@ describe("app", () => {
     });
   });
   test("404: responds with no articles when an unknown topic is provided", () => {
-    const topic = 'fake'
+    const topic = 'fake';
     return request(app)
     .get(`/api/articles`)
-    .query({ topic: topic })
+    .query({ topic })
     .expect(404)
     .then((response) => { 
       const {msg} = response.body;
@@ -177,10 +177,10 @@ describe("app", () => {
     });
   });
   test("200: responds with articles sorted by property when passed sort_by", () => {
-    const sort_by = 'title'
+    const sort_by = 'title';
     return request(app)
     .get(`/api/articles`)
-    .query({ sort_by: sort_by })
+    .query({ sort_by })
     .expect(200)
     .then((response) => { 
       const {articles} = response.body;
@@ -188,17 +188,17 @@ describe("app", () => {
     });
   });
   test("400: responds with bad request when passed invalid sort_by", () => {
-    const sort_by = 'fake'
+    const sort_by = 'fake';
     return request(app)
     .get(`/api/articles`)
-    .query({ sort_by: sort_by })
+    .query({ sort_by })
     .expect(400);
   });
   test("200: responds with articles sorted ascending when passed order asc", () => {
-    const order = 'asc'
+    const order = 'asc';
     return request(app)
     .get(`/api/articles`)
-    .query({ order: order })
+    .query({ order })
     .expect(200)
     .then((response) => { 
       const {articles} = response.body;
@@ -206,14 +206,27 @@ describe("app", () => {
     });
   });
   test("400: responds with bad request when passed invalid order", () => {
-    const order = 'fake'
+    const order = 'fake';
     return request(app)
     .get(`/api/articles`)
-    .query({ order: order })
+    .query({ order })
     .expect(400)
     .then((response) => { 
       const {msg} = response.body;
-      expect(msg).toEqual(`The order query must be 'asc' or 'desc'`);
+      expect(msg).toEqual(`Invalid input`);
+    });
+  });
+  test("404: responds with not found when sort_by and order are valid but no articles are returned", () => {
+    const topic = 'fake';
+    const sort_by = 'title';
+    const order = 'asc';
+    return request(app)
+    .get(`/api/articles`)
+    .query({ topic, sort_by, order })
+    .expect(404)
+    .then((response) => {
+      const {msg} = response.body;
+      expect(msg).toEqual('No articles found');
     });
   });
  });
