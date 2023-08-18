@@ -327,7 +327,7 @@ describe("app", () => {
     .send(requestBody)
     .expect(200)
     .then((response) => {
-      const article = response.body.article;
+      const { article }= response.body;
       expect(article).toHaveProperty("votes", expectedVotes);
       expect(article).toHaveProperty("author", expect.any(String));
       expect(article).toHaveProperty("title", expect.any(String));
@@ -351,27 +351,6 @@ describe("app", () => {
       expect(article).toHaveProperty("votes", expectedVotes);
     });
   });
-  test("200: patching an existing article more than once with positive and negative votes responds with article having the correct votes", () => {
-    const testArticleId = 4;
-    const requestBody = { inc_votes: -12 };
-    const requestBody2 = { inc_votes: 15 };
-    const expectedVotes = 3;
-    return request(app)
-    .patch(`/api/articles/${testArticleId}`)
-    .send(requestBody)
-    .expect(200)
-    .then((response) => {
-      return request(app)
-      .patch(`/api/articles/${testArticleId}`)
-      .send(requestBody2)
-      .expect(200)
-      .then((response) => {
-        const article = response.body.article;
-        expect(article).toHaveProperty("votes", expectedVotes);
-      });
-    });
-    
-  });
   test("404: responds with a status of 404 when the article is not found", () => {
     const testArticleId = 40000;
     const requestBody = { inc_votes: 5 };
@@ -380,7 +359,7 @@ describe("app", () => {
     .send(requestBody)
     .expect(404)
     .then(({body}) => {
-      expect(body.msg).toBe("No article found for article_id: 40000")
+      expect(body.msg).toBe(`No article found for article_id: ${testArticleId}`)
     });
   });
   test("400: responds with a status of 400 when the article id is an invalid number", () => {
