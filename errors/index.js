@@ -7,7 +7,12 @@ exports.handleCustomErrors = (err, req, res, next) => {
 exports.handlePsqlErrors = (err, req, res, next) => {
     const invalid_text_representation = '22P02';
     const foreign_key_violation = '23503';
-    if (err.code === foreign_key_violation || err.code === invalid_text_representation) {
+    const undefined_column = '42703';
+    const syntax_error = '42601';
+    if (err.code === foreign_key_violation || 
+        err.code === invalid_text_representation ||
+        err.code === undefined_column ||
+        err.code === syntax_error) {
         res.status(400).send({ msg: 'Invalid input' });
     } else next(err);
   };

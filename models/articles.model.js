@@ -10,7 +10,14 @@ exports.selectArticlesByArticleId = (articleId) => {
     });
   }
 
-  return db.query('SELECT * FROM articles WHERE article_id = $1;', [parsedArticleId])
+  return db.query(`
+    SELECT 
+      articles.*,
+      COUNT(comments.article_id)::int AS comment_count
+    FROM articles
+    LEFT JOIN comments ON articles.article_id = comments.article_id
+    WHERE articles.article_id = $1
+    GROUP BY articles.article_id;`, [parsedArticleId])
    .then( result => {
     if(result.rows.length === 0) {
       return Promise.reject({
@@ -23,7 +30,12 @@ exports.selectArticlesByArticleId = (articleId) => {
   });
 };
 
-exports.selectAllArticles = () => {
+exports.selectAllArticles = (topic, sort_by="created_at", order="desc") => { 
+  let topicFilter = "";
+  if(topic) {
+    topicFilter = `WHERE topic = '${topic}'`;
+  }
+
   return db.query(`
     SELECT 
       articles.author, 
@@ -36,8 +48,9 @@ exports.selectAllArticles = () => {
       COUNT(comments.article_id)::int AS comment_count
     FROM articles
     LEFT JOIN comments ON articles.article_id = comments.article_id
+    ${topicFilter}
     GROUP BY articles.article_id
-    ORDER BY created_at DESC;`)
+    ORDER BY ${sort_by} ${order};`)
     .then(result => {
       if(result.rows.length === 0) {
         return Promise.reject({
