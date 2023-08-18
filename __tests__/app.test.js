@@ -419,10 +419,7 @@ describe("app", () => {
     const testCommentId = 1;
     return request(app)
     .delete(`/api/comments/${testCommentId}`)
-    .expect(204)
-    .then((response) => {
-      expect(response.body).toEqual({});
-    });
+    .expect(204);
   });
   test("404: deleting an existing comment responds with 204 and deleting comment again returns 404", () => {
     const testCommentId = 1;
