@@ -316,7 +316,154 @@ describe("app", () => {
         expect(comment).not.toHaveProperty('age', 38)
      });
   });
- })
+ });
+ describe("PATCH /api/articles/:article_id", () => {
+  test("200: patching an existing article with positive votes responds with article having incremented votes", () => {
+    const testArticleId = 4;
+    const requestBody = { inc_votes: 3 };
+    const expectedVotes = 3;
+    return request(app)
+    .patch(`/api/articles/${testArticleId}`)
+    .send(requestBody)
+    .expect(200)
+    .then((response) => {
+      const { article }= response.body;
+      expect(article).toHaveProperty("votes", expectedVotes);
+      expect(article).toHaveProperty("author", expect.any(String));
+      expect(article).toHaveProperty("title", expect.any(String));
+      expect(article).toHaveProperty("article_id", testArticleId);
+      expect(article).toHaveProperty("body", expect.any(String));
+      expect(article).toHaveProperty("topic", expect.any(String));
+      expect(article).toHaveProperty("created_at", expect.any(String));
+      expect(article).toHaveProperty("article_img_url", expect.any(String));
+    });
+  });
+  test("200: patching an existing article with negative votes responds with article having decremented votes", () => {
+    const testArticleId = 4;
+    const requestBody = { inc_votes: -12 };
+    const expectedVotes = -12;
+    return request(app)
+    .patch(`/api/articles/${testArticleId}`)
+    .send(requestBody)
+    .expect(200)
+    .then((response) => {
+      const article = response.body.article;
+      expect(article).toHaveProperty("votes", expectedVotes);
+    });
+  });
+  test("404: responds with a status of 404 when the article is not found", () => {
+    const testArticleId = 40000;
+    const requestBody = { inc_votes: 5 };
+    return request(app)
+    .patch(`/api/articles/${testArticleId}`)
+    .send(requestBody)
+    .expect(404)
+    .then(({body}) => {
+      expect(body.msg).toBe(`No article found for article_id: ${testArticleId}`)
+    });
+  });
+  test("400: responds with a status of 400 when the article id is an invalid number", () => {
+    const testArticleId = "Hello";
+    const requestBody = { inc_votes: -1 };
+    return request(app)
+    .patch(`/api/articles/${testArticleId}`)
+    .send(requestBody)
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toBe("Invalid input");
+    });
+  });
+  test("400: responds with a status of 400 when the inc_votes property is missing", () => {
+    const testArticleId = 4;
+    const requestBody = { };
+    return request(app)
+    .patch(`/api/articles/${testArticleId}`)
+    .send(requestBody)
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toBe("An inc_votes property is required");
+    });
+  });
+  test("400: responds with a status of 400 when the inc_votes property is an invalid number", () => {
+    const testArticleId = 4;
+    const requestBody = { inc_votes: "cats" };
+    return request(app)
+    .patch(`/api/articles/${testArticleId}`)
+    .send(requestBody)
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toBe("Invalid input");
+    });
+  });
+ });
+ describe("DELETE /api/comments/:comment_id", () => {
+  test("404: responds with a status of 404 when the comment is not found", () => {
+    const testCommentId = 40000;
+    return request(app)
+    .delete(`/api/comments/${testCommentId}`)
+    .expect(404)
+    .then(({body}) => {
+      expect(body.msg).toBe("No comment found with comment_id: 40000")
+    });
+  });
+  test("400: responds with a status of 400 when the comment id is an invalid number", () => {
+    const testCommentId = "hello";
+    return request(app)
+    .delete(`/api/comments/${testCommentId}`)
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toBe("Invalid input");
+    });
+  });
+  test("204: deleting an existing comment responds with 204 and no content", () => {
+    const testCommentId = 1;
+    return request(app)
+    .delete(`/api/comments/${testCommentId}`)
+    .expect(204);
+  });
+  test("404: deleting an existing comment responds with 204 and deleting comment again returns 404", () => {
+    const testCommentId = 1;
+    return request(app)
+    .delete(`/api/comments/${testCommentId}`)
+    .expect(204)
+    .then((response) => {
+      expect(response.body).toEqual({});
+      return request(app)
+        .delete(`/api/comments/${testCommentId}`)
+        .expect(404)
+        .then(({body}) => {
+          expect(body.msg).toBe("No comment found with comment_id: 1");
+        });
+    });
+  });
+ });
+ describe("GET /api/users", () => {
+  test("200: Getting users responds with 200 and an array of users with the expected properties", () => {
+    return request(app)
+    .get(`/api/users`)
+    .expect(200)
+    .then((response) => { 
+      const {users} = response.body;
+      expect(users).toBeInstanceOf(Array);
+      expect(users.length).not.toEqual(0);
+      users.forEach((article) => {
+        expect(article).toBeInstanceOf(Object);
+        expect(article).toHaveProperty("username", expect.any(String));
+        expect(article).toHaveProperty("name", expect.any(String));
+        expect(article).toHaveProperty("avatar_url", expect.any(String));
+      });
+    });
+  });
+  test("200: responds with an array of users with correct data", () => {
+    return request(app)
+    .get("/api/users")
+    .expect(200)
+    .then((response) => {
+      const {users} = response.body;
+      expect(users).toEqual(userData);
+    });  
+  });
+ });
  describe("Error handling", () => {
   test("404:route that does not exist returns 404", () => {
     return request(app).get("/notARoute").expect(404);
