@@ -101,9 +101,21 @@ describe("app", () => {
       expect(article).toHaveProperty("topic", expect.any(String));
       expect(article).toHaveProperty("created_at", expect.any(String));
       expect(article).toHaveProperty("votes", expect.any(Number));
-      expect(article).toHaveProperty("article_img_url", expect.any(String));
+      expect(article).toHaveProperty("article_img_url", expect.any(String))
+      expect(article).toHaveProperty("comment_count", 2);
     })
-  })
+  });
+  test("200: responds with correct comment_count", () => {
+    const testArticleId = 3;
+    return request(app)
+    .get(`/api/articles/${testArticleId}`)
+    .expect(200)
+    .then((response) => { 
+      const { article } = response.body;
+      const expectedCommentCount = 2;
+      expect(article).toHaveProperty("comment_count", expectedCommentCount);
+    });
+  });
  });
  describe("GET /api/articles", () => {
   test("200: responds with a status of 200 when article objects are found", () => {
