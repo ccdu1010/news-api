@@ -23,7 +23,20 @@ exports.selectArticlesByArticleId = (articleId) => {
   });
 };
 
-exports.selectAllArticles = () => {
+exports.selectAllArticles = (topic, sort_by="created_at", order="desc") => {
+  if(order.toLowerCase() !== 'asc' &&
+     order.toLowerCase() !== 'desc') {
+    return Promise.reject({
+      status: 400,
+      msg: `The order query must be 'asc' or 'desc'`,
+    });
+  }
+  
+  let topicFilter = "";
+  if(topic) {
+    topicFilter = `WHERE topic = '${topic}'`;
+  }
+
   return db.query(`
     SELECT 
       articles.author, 
@@ -36,8 +49,9 @@ exports.selectAllArticles = () => {
       COUNT(comments.article_id)::int AS comment_count
     FROM articles
     LEFT JOIN comments ON articles.article_id = comments.article_id
+    ${topicFilter}
     GROUP BY articles.article_id
-    ORDER BY created_at DESC;`)
+    ORDER BY ${sort_by} ${order};`)
     .then(result => {
       if(result.rows.length === 0) {
         return Promise.reject({
