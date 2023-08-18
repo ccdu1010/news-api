@@ -149,7 +149,73 @@ describe("app", () => {
       expect(article).not.toHaveProperty("body");
     });
   });
- });
+  });
+  test("200: responds with only articles matching topic when topic is provided", () => {
+    const topic = 'mitch'
+    return request(app)
+    .get(`/api/articles`)
+    .query({ topic: topic })
+    .expect(200)
+    .then((response) => { 
+      const {articles} = response.body;
+      expect(articles.length).not.toEqual(0);
+      articles.forEach((article) => {
+        expect(article).toBeInstanceOf(Object);
+        expect(article).toHaveProperty("topic", topic);
+      });
+    });
+  });
+  test("404: responds with no articles when an unknown topic is provided", () => {
+    const topic = 'fake'
+    return request(app)
+    .get(`/api/articles`)
+    .query({ topic: topic })
+    .expect(404)
+    .then((response) => { 
+      const {msg} = response.body;
+      expect(msg).toEqual('No articles found');
+    });
+  });
+  test("200: responds with articles sorted by property when passed sort_by", () => {
+    const sort_by = 'title'
+    return request(app)
+    .get(`/api/articles`)
+    .query({ sort_by: sort_by })
+    .expect(200)
+    .then((response) => { 
+      const {articles} = response.body;
+      expect(articles).toBeSortedBy('title', { descending: true });
+    });
+  });
+  test("400: responds with bad request when passed invalid sort_by", () => {
+    const sort_by = 'fake'
+    return request(app)
+    .get(`/api/articles`)
+    .query({ sort_by: sort_by })
+    .expect(400);
+  });
+  test("200: responds with articles sorted ascending when passed order asc", () => {
+    const order = 'asc'
+    return request(app)
+    .get(`/api/articles`)
+    .query({ order: order })
+    .expect(200)
+    .then((response) => { 
+      const {articles} = response.body;
+      expect(articles).toBeSortedBy('created_at', { descending: false });
+    });
+  });
+  test("400: responds with bad request when passed invalid order", () => {
+    const order = 'fake'
+    return request(app)
+    .get(`/api/articles`)
+    .query({ order: order })
+    .expect(400)
+    .then((response) => { 
+      const {msg} = response.body;
+      expect(msg).toEqual(`The order query must be 'asc' or 'desc'`);
+    });
+  });
  });
  describe("GET /api/articles/:article_id/comments", () => {
   test("404: responds with a status of 404 when the article is not found", () => {
