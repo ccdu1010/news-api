@@ -1,7 +1,7 @@
 {
-  "name": "be-nc-news",
+  "name": "news-api",
   "version": "1.0.0",
-  "description": "bc-nc-news",
+  "description": "news-api",
   "main": "listen.js",
   "scripts": {
     "start": "node listen.js",
@@ -14,15 +14,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/northcoders/be-nc-news.git"
+    "url": "git+https://github.com/ccdu1010/news-api.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/northcoders/be-nc-news/issues"
+    "url": "https://github.com/ccdu1010/news-api/issues"
   },
-  "homepage": "https://github.com/northcoders/be-nc-news#readme",
+  "homepage": "https://github.com/ccdu1010/news-api#readme",
   "devDependencies": {
     "husky": "^8.0.2",
     "jest": "^27.5.1",
