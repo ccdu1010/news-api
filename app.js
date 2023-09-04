@@ -1,18 +1,23 @@
-const express = require ("express");
+const express = require("express");
+const cors = require("cors");
 const { getAllTopics } = require("./controllers/topics.controller");
 const { getApi } = require("./controllers/api.controller");
-const { 
-        getArticleById, 
-        getAllArticles, 
-        getAllCommentsByArticleId, 
-        postCommentForArticle, 
-        patchArticleByArticleId 
-    } = require("./controllers/articles.controller");
+const {
+  getArticleById,
+  getAllArticles,
+  getAllCommentsByArticleId,
+  postCommentForArticle,
+  patchArticleByArticleId,
+} = require("./controllers/articles.controller");
 const { deleteCommentById } = require("./controllers/comments.controller");
 const { getAllUsers } = require("./controllers/users.controller");
-const { handleCustomErrors, handlePsqlErrors, handleServerErrors } = require('./errors/index.js');
+const {
+  handleCustomErrors,
+  handlePsqlErrors,
+  handleServerErrors,
+} = require("./errors/index.js");
 const app = express();
-
+app.use(cors());
 app.use(express.json());
 
 app.get("/api/topics", getAllTopics);
